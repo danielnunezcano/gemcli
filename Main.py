@@ -16,6 +16,8 @@ while True:
         break
     contenido = ProcessInteraction.processUserInput(linea)
     os.system('cls' if os.name == 'nt' else 'clear') 
+    print("-------HUMANO----------")
+    print(contenido)
     response = Gemini.question(contenido, conversation)
     with open(conversation, "a+", encoding="utf-8") as conversationFile:
         pass
@@ -23,4 +25,6 @@ while True:
         conversationFile.write(contenido + "\n")
         conversationFile.write("-------GEMINI----------" + "\n")
         conversationFile.write(response + "\n")
+        print("-------GEMINI----------")
         print(response)
+        print("---------------------\n")

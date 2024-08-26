@@ -6,7 +6,6 @@ model = genai.GenerativeModel('gemini-1.5-pro')
 sizeFileMax = 2000000
 
 def question(questionText, conversation):
-    print(questionText)
     if os.path.exists(conversation):
         with open(conversation, "r", encoding="utf-8") as conversationFile:
             conver = conversationFile.read()
