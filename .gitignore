@@ -8,3 +8,7 @@
 /dataSources.local.xml
 .idea
 /conversations
+/.vscode/
+*.pyc
+/build/
+/dist/
