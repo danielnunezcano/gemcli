@@ -1,9 +1,0 @@
--------HUMAN----------
-dame solo el comando linux sin explicación de lo que hace, ya que solo lo quiero copiar y pegar de lo siguiente:
-imprimir el tamaño de los archivos de una carpeta
-
--------GEMINI----------
-```bash
-du -sh *
-```
-
