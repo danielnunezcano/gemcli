@@ -1,13 +1,6 @@
 import pyttsx3
 
 def speak(text, voice_id=21):
-    """
-    Convierte texto a voz utilizando pyttsx3.
-
-    Args:
-        text: El texto que se desea convertir a voz.
-        voice_id: El índice de la voz a utilizar (opcional, por defecto es 21).
-    """
 
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
