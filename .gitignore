@@ -7,8 +7,8 @@
 /dataSources/
 /dataSources.local.xml
 .idea
-/conversations
+/conversations/
 /.vscode/
 *.pyc
 /build/
-/dist/
+*.spec
