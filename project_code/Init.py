@@ -57,7 +57,6 @@ def process_interaction(conversation):
     print(processed_input)
 
     response = Gemini.question(processed_input, conversation)
-
     with open(conversation, "a+", encoding="utf-8") as conversation_file:
         conversation_file.write("-------HUMAN----------\n")
         conversation_file.write(processed_input + "\n")

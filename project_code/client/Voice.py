@@ -1,15 +1,26 @@
-import pyttsx3
+from gtts import gTTS
+from pydub import AudioSegment
+from playsound import playsound
+import os
+import time
 
-def speak(text, voice_id=21):
+def speak(text):
+    tts = gTTS(text, lang='es')
+    tts.save("/home/danielnezcano/.gemcli-py/audio.mp3")
 
-    engine = pyttsx3.init()
-    voices = engine.getProperty('voices')
+    # Carga el audio
+    audio = AudioSegment.from_mp3("/home/danielnezcano/.gemcli-py/audio.mp3")
 
-    # Verifica si el índice de voz es válido
-    if 0 <= voice_id < len(voices):
-        engine.setProperty("voice", voices[voice_id].id)
-    else:
-        print(f"Advertencia: Índice de voz inválido ({voice_id}). Usando la voz predeterminada.")
+    # Aumenta la velocidad en un 20% (ajusta el valor según tus necesidades)
+    audio_acelerado = audio.speedup(playback_speed=1.3)
 
-    engine.say(text)
-    engine.runAndWait()
+    # Guarda el audio acelerado
+    audio_acelerado.export("/home/danielnezcano/.gemcli-py/audio_acelerado.mp3", format="mp3") 
+
+    # Guarda el PID del proceso actual
+    pid_actual = os.getpid()
+
+    # Inicia la reproducción en segundo plano
+    playsound("/home/danielnezcano/.gemcli-py/audio_acelerado.mp3", block=False)
+
+
