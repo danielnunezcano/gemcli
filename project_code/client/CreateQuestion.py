@@ -1,4 +1,4 @@
-from . import WriteAuxFile
+from . import (WriteAuxFile, GeminiCustom)
 
 def create_question(user_input, question_file_path):
     with open(question_file_path, "w", encoding="utf-8") as question_file:

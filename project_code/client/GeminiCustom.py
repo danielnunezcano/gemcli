@@ -1,30 +1,12 @@
-import google.generativeai as genai
+import custom_gemini as cgem
 import os
+import re
 
 # Configuración inicial
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-DEFAULT_MODEL = 'gemini-1.5-pro'
-model = genai.GenerativeModel(DEFAULT_MODEL)
 MAX_FILE_SIZE = 2000000
-gemini_model = None  # Inicializa gemini_model como None
-CONFIG_FILE_PATH = "/home/danielnezcano/.gemcli-py/config/config.txt"
+CONFIG_FILE_PATH = "/home/daniel/.gemcli-py/config/config.txt"
 
 def question(question_text, conversation_file_path):
-    """
-    Envía una pregunta a Gemini y obtiene la respuesta.
-
-    Args:
-        question_text: El texto de la pregunta.
-        conversation_file_path: La ruta del archivo de conversación.
-
-    Returns:
-        La respuesta de Gemini.
-    """
-
-    global gemini_model, model
-
-    if gemini_model:
-        model = genai.GenerativeModel(gemini_model)
 
     if os.path.exists(conversation_file_path):
         with open(conversation_file_path, "r", encoding="utf-8") as conversation_file:
@@ -40,11 +22,22 @@ def question(question_text, conversation_file_path):
 
     while True:
         try:
-            response = model.generate_content(prompt)
+            response = None
+            pdf_files = extract_files_paths(question_text,"pdf")
+            image_files = extract_files_paths(question_text,"image")
+            audio_files = extract_files_paths(question_text,"audio")
+
+            if len(pdf_files) > 0:
+                response = cgem.generate_pdf_response(prompt,pdf_files)
+            if len(image_files) > 0:
+                response = cgem.generate_image_response(prompt,image_files)
+            if len(audio_files) > 0:
+                response = cgem.generate_audio_response(prompt,audio_files)
+            else:
+                response = cgem.generate_response(prompt)
             return response.text
         except Exception as e:  # Captura cualquier excepción
-            print(f"Error al usar el modelo {gemini_model}: {e}")
-            set_gemini_model()
+            print(f"Error al usar el modelo: {e}")
 
 def summarize_conversation(conversation):
     """
@@ -58,7 +51,7 @@ def summarize_conversation(conversation):
     """
 
     prompt = f"Resumeme lo siguiente: {conversation}"
-    response = model.generate_content(prompt)
+    response = cgem.generate_response(prompt)
     return response.text
 
 def save_conversation(conversation, conversation_file_path):
@@ -74,71 +67,24 @@ def save_conversation(conversation, conversation_file_path):
         conversation_file.write("-------GEMINI----------\n")
         conversation_file.write(conversation + "\n")
 
-def get_models():
+import re
+
+def extract_files_paths(text, file_type):
     """
-    Obtiene la lista de modelos disponibles y permite al usuario seleccionar uno.
+    Extrae las rutas de archivos con una estructura específica de un texto.
+
+    Args:
+      text (str): El texto del que se extraerán las rutas.
+      file_type (str): El tipo de archivo a buscar (por ejemplo, 'pdf', 'image', etc.).
 
     Returns:
-        El nombre del modelo seleccionado.
+      list: Una lista con las rutas de archivos encontradas.
     """
+    if not file_type:
+        raise ValueError("El argumento 'file_type' no puede estar vacío.")
 
-    models = list(genai.list_models())
-    for i, model in enumerate(models, 1):
-        name = model.name.replace("models/", "")
-        print(f"{i}\t{name}")
+    # Construir el patrón dinámico para encontrar rutas basadas en el tipo
+    pattern = rf"{file_type}:'(.*?\..*?)'"
+    paths = re.findall(pattern, text)
+    return paths
 
-    while True:
-        try:
-            choice = int(input("Elige un modelo (número): "))
-            if 1 <= choice <= len(models):
-                return models[choice - 1].name.replace("models/", "")
-            else:
-                print("Opción inválida. Inténtalo de nuevo.")
-        except ValueError:
-            print("Entrada inválida. Debes ingresar un número.")
-
-def set_gemini_model():
-    """
-    Permite al usuario seleccionar un modelo y lo guarda en la configuración.
-    """
-
-    global gemini_model, model
-
-    print("Elige el modelo")
-    gemini_model = get_models()
-
-    with open(CONFIG_FILE_PATH, "w") as f:
-        f.write(gemini_model)
-
-    model = genai.GenerativeModel(gemini_model)
-
-def set_init_gemini_model():
-    """
-    Carga el modelo desde la configuración o establece el modelo predeterminado si no se encuentra.
-
-    Returns:
-        El nombre del modelo cargado o el modelo predeterminado.
-    """
-
-    global gemini_model
-
-    try:
-        with open(CONFIG_FILE_PATH, "r") as f:
-            gemini_model = f.read().strip()
-    except FileNotFoundError:
-        gemini_model = DEFAULT_MODEL
-        with open(CONFIG_FILE_PATH, "w") as f:
-            f.write(gemini_model)
-
-    return gemini_model
-
-def gemini_model_user():
-    """
-    Devuelve el nombre del modelo actualmente en uso.
-
-    Returns:
-        El nombre del modelo.
-    """
-
-    global gemini_model
-    return gemini_model
