@@ -28,14 +28,14 @@ def question(question_text, conversation_file_path):
             audio_files = extract_files_paths(question_text,"audio")
 
             if len(pdf_files) > 0:
-                response = cgem.generate_pdf_response(prompt,pdf_files)
-            if len(image_files) > 0:
+                response = cgem.generate_pdf_response(prompt,pdf_files[0])
+            elif len(image_files) > 0:
                 response = cgem.generate_image_response(prompt,image_files)
-            if len(audio_files) > 0:
-                response = cgem.generate_audio_response(prompt,audio_files)
+            elif len(audio_files) > 0:
+                response = cgem.generate_audio_response(prompt,audio_files[0])
             else:
                 response = cgem.generate_response(prompt)
-            return response.text
+            return response
         except Exception as e:  # Captura cualquier excepción
             print(f"Error al usar el modelo: {e}")
 
