@@ -1,3 +1,4 @@
+import re
 from .client import GeminiCustom as Gemini
 from .client import Voice
 from .service import ProcessInteraction
@@ -57,9 +58,26 @@ def process_interaction(conversation):
         conversation_file.write("-------GEMINI----------\n")
         conversation_file.write(response + "\n")
     print("-------GEMINI----------")
-    print(response)
+    print(text_style(response))
     print("---------------------\n")
     if checkVoice == True:
         Voice.speak(response)
 
     return True
+
+def text_style(text):
+    return text_style_list(text_style_code(text_style_bold(text)))
+
+def text_style_bold(text):
+    regex_bold_gemini=r"\*\*(.+?)\*\*"
+    regex_bold_print=r"\033[1;32m\1\033[0m"
+    return re.sub(regex_bold_gemini,regex_bold_print,text)
+
+def text_style_code(text):
+    regex_bold_gemini = r"```(.*?)```"
+    regex_bold_print = r"\033[3mcode:\1\033[0m"
+    return re.sub(regex_bold_gemini, regex_bold_print, text, flags=re.S)
+
+def text_style_list(text):
+    return text.replace("* ","  \u2022 ")
+
