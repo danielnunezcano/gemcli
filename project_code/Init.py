@@ -74,9 +74,9 @@ def text_style_bold(text):
     return re.sub(regex_bold_gemini,regex_bold_print,text)
 
 def text_style_code(text):
-    regex_bold_gemini = r"```(.*?)```"
-    regex_bold_print = r"\033[3mcode:\1\033[0m"
-    return re.sub(regex_bold_gemini, regex_bold_print, text, flags=re.S)
+    regex_cursive_gemini = r"```(.*?)```"
+    regex_cursive_print = r"\033[3;37mcode:\1\033[0m"
+    return re.sub(regex_cursive_gemini, regex_cursive_print, text, flags=re.S)
 
 def text_style_list(text):
     return text.replace("* ","  \u2022 ")
