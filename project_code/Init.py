@@ -4,15 +4,43 @@ from .client import Voice
 from .service import ProcessInteraction
 import os
 import sys
+from InquirerPy import inquirer
+
 
 checkVoice = False
+actual_conversation = ""
 
 def init():
     clear_screen()
     conversation_filename = get_conversation_filename()
+    clear_screen()
+    print(f"Conversación: {actual_conversation}")
     while True:
         if not process_interaction(conversation_filename):
-            break 
+            break
+
+def conversation_list():
+    folder = "/home/daniel/.gemcli-py/conversations"
+    files_menu = ["<Crear nueva conversación>"]
+    global actual_conversation
+    try:
+        files = os.listdir(folder)
+        for file in files:
+            files_menu.append(file)
+    except FileNotFoundError:
+        print("Carpeta no encontrada.")
+    except Exception as e:
+        print(f"Ocurrió un error: {e}")
+    actual_conversation = inquirer.select(
+        message="Elige una conversación:",
+        choices=files_menu,
+        pointer="➤",  # Marcador personalizado
+    ).execute()
+
+    if(actual_conversation=="<Crear nueva conversación>"):
+        print("Elige nombre para la conversación: ")
+        actual_conversation = input()
+    return actual_conversation
 
 def handle_interrupt(signal, frame):
     """Handles Ctrl+C interrupt."""
@@ -22,12 +50,9 @@ def handle_interrupt(signal, frame):
 
 def get_conversation_filename():
     """Gets conversation filename from arguments."""
-    if len(sys.argv) < 1:
-        print("No arguments provided.")
-        sys.exit(1)
+    if len(sys.argv) <= 1:
+        res = "/home/daniel/.gemcli-py/conversations/" + conversation_list()
     if len(sys.argv) > 1:
-        res = "/home/daniel/.gemcli-py/conversations/" + sys.argv[1]
-    if len(sys.argv) > 2:
         set_options(sys.argv[2])
     return res
 
@@ -48,6 +73,7 @@ def process_interaction(conversation):
 
     processed_input = ProcessInteraction.process_user_input(user_input, conversation)
     clear_screen()
+    print(f"Conversación: {actual_conversation}")
     print("-------HUMAN----------")
     print(processed_input)
 
