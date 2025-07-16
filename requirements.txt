@@ -1,0 +1,9 @@
+# Core dependencies for GemCLI
+InquirerPy>=0.3.0
+gtts>=2.3.0
+pydub>=0.25.0
+playsound>=1.3.0
+
+# Note: custom_gemini is a custom wrapper for Gemini API
+# You may need to install it separately or configure it
+# according to your Gemini API setup
